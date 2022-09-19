@@ -19,6 +19,7 @@ Route::group(['prefix' => 'v1'], function () {
 
     Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
         Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
+        Route::post('events', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
     });
 
 });
@@ -28,5 +29,10 @@ Route::group(['prefix' => 'v1'], function () {
     add here the custom api 
 */
 Route::group(['prefix' => 'v2'], function () {
-    Route::post('/generate-token', 'EntregoController@authenticate')->name('generateToken2');
+
+    Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
+        Route::post('/generate-token', 'EntregoController@authenticate')->name('generateToken2');
+    });
+
+    
 });

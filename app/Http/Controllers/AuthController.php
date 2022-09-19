@@ -3,11 +3,60 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Player;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use App\Models\ApiAccount;
 
 
 class AuthController extends Controller
 {
-    public function generateToken(){
 
+    public function generateToken(Request $request){
+        $payload = $request->payload;
+        $data = decodeToken($payload);
+        if(!$data['error']){
+            $request = $data['data'];
+
+            $token = substr(str_shuffle( 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@$'), 0, 100);
+
+            $player = Player::where(['partner_id' => $request->player_id])->first();
+
+            if($player){
+                if($player->username == $request->username){
+                    $player->token = $token;
+                    $player->username = $request->username;
+                    $player->status = 'ACTIVE';
+                    $save = $player->save();
+                }
+            }else{
+                $save = Player::create([
+                    'created' => date('Y-m-d H:i:s'),
+                    'password' => $token,
+                    'token' => $token,
+                    'username' => $request->username,
+                    'partner_id' => $request->player_id,
+                    'jwt' => '',
+                    'status' => 'ACTIVE',
+                ]);
+            }
+
+            if($save)
+            {
+                $response['error'] = false;
+                $response['message'] = 'Success';
+                $response['token'] = $token;
+
+                return response()->json($response, 200);
+            }
+
+        }else{
+            return response()->json(
+                [
+                    'error' => true,
+                    'message' => $data['message']
+                ], 
+            409);
+        }
     }
 }
