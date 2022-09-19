@@ -17,7 +17,7 @@ class Authorization
     public function handle($request, Closure $next)
     {
         if(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])){
-            $valid_passwords = array (env('API_SANDBOX_APPID') => env('API_SANDBOX_SECRETKEY'));
+            $valid_passwords = array (env('API_SANDBOX_APPID') => env('API_SANDBOX_APPPASSWORD'));
             $valid_users = array_keys($valid_passwords);
 
             $user = $_SERVER['PHP_AUTH_USER'];
