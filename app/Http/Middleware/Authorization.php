@@ -33,7 +33,7 @@ class Authorization
 
             return $next($request);
         }else{
-            header('WWW-Authenticate: Basic realm="Sophia Jewellery"');
+            header('WWW-Authenticate: Basic realm="API Sandbox"');
             header('HTTP/1.0 401 Unauthorized');
             die ("Not authorized");
         }
