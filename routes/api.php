@@ -16,11 +16,11 @@ use Illuminate\Support\Facades\Route;
 
 /* ========== add here all the base api ========= */
 Route::group(['prefix' => 'v1'], function () {
-    Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
 
     Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
-
+        Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
     });
+
 });
 
 /* ========== for Facilito project purpose ========= */
