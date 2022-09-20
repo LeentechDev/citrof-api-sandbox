@@ -26,21 +26,21 @@ class PlayerController extends Controller
         }else{
             $payload = decodeToken($request->payload);
             if(!$payload['error']){
-                $data = $payload['data'];
+                $request = $payload['data'];
                 $keyword = null;
                 $per_page = 10;
-                if($data->per_page){
-                    $per_page = $data->per_page;
+                if($request->per_page){
+                    $per_page = $request->per_page;
                 }
 
                 $query = Player::query();
 
-                if ($data->keyword) {
-                    $keyword = $data->keyword;
-                    $query = $query->where('username', 'like', '%'.$data->keyword.'%');
+                if ($request->keyword) {
+                    $keyword = $request->keyword;
+                    $query = $query->where('username', 'like', '%'.$request->keyword.'%');
                 }
         
-                $players = $query->paginate($data->per_page ? $data->per_page : 10);
+                $players = $query->paginate($request->per_page ? $request->per_page : 10);
 
                 return response()->json(
                     [
@@ -59,5 +59,51 @@ class PlayerController extends Controller
                 409);
             }
         }           
+    }
+
+    public function get(Request $request){
+        $rules = [
+            'payload' => 'required',
+        ];
+        $validator = Validator::make($request->all(),$rules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'error' => true,
+                    'message' => 'Invalid request parameters'
+                ], 
+            400);
+        }else{
+            $payload = decodeToken($request->payload);
+            if(!$payload['error']){
+                $request = $payload['data'];
+
+                $query = Player::query();
+
+                $query = $query->where('partner_id', $request->player_id);
+
+                if($request->status){
+                    $query = $query->where('status', $request->status);
+                }
+
+                $player = $query->first();
+
+                return response()->json(
+                    [
+                        'error' => false,
+                        'message' => 'success',
+                        'data' => $player,
+                    ], 
+                200);
+
+            }else{
+                return response()->json(
+                    [
+                        'error' => true,
+                        'message' => $payload['message'],
+                    ], 
+                409);
+            }
+        }
     }
 }
