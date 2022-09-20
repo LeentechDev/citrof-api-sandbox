@@ -21,8 +21,8 @@ class AuthController extends Controller
     }
 
     public function generateToken(Request $request){
-        $payload = $request->payload;
-        $data = decodeToken($payload);
+
+        $data = decodeToken($request);
         if(!$data['error']){
             $request = $data['data'];
 

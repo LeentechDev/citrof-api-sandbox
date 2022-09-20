@@ -20,7 +20,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
         Route::get('getToken', [App\Http\Controllers\AuthController::class, 'getToken'])->name('getToken');
         Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
-        Route::post('events', [App\Http\Controllers\AuthController::class, 'getEvents'])->name('getEvents');
+        Route::get('events', [App\Http\Controllers\EventController::class, 'getEvents'])->name('getEvents');
     });
 
 });
