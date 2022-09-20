@@ -25,8 +25,7 @@ class LoadingController extends Controller
         }else{
             $payload = decodeToken($request);
             if(!$payload['error']){
-                $request = $payload['data'];
-
+                $request = (array)$payload['data'];
                 $rules = [
                     'player_id' => 'required',
                     'amount' => 'required',
