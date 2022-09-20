@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Player;
-use Firebase\JWT\Key;
 use Validator;
 
 class PlayerController extends Controller
@@ -20,7 +18,7 @@ class PlayerController extends Controller
             return response()->json(
                 [
                     'error' => true,
-                    'message' => 'Invalid request parameters'
+                    'message' => 'Payload is missing'
                 ], 
             400);
         }else{
@@ -70,7 +68,7 @@ class PlayerController extends Controller
             return response()->json(
                 [
                     'error' => true,
-                    'message' => 'Invalid request parameters'
+                    'message' => 'Payload is missing'
                 ], 
             400);
         }else{
