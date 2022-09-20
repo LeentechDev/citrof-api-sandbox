@@ -30,6 +30,9 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/list','App\Http\Controllers\PlayerController@index')->name('player_list');
         Route::post('/details','App\Http\Controllers\PlayerController@get')->name('player_details');
     });
+    Route::group(['prefix' => 'load'], function () {
+        Route::post('/cashin','App\Http\Controllers\LoadingController@cash_in')->name('player_cashin');
+    });
 
 });
 
