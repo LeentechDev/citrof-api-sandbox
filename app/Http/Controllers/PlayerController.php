@@ -10,8 +10,7 @@ class PlayerController extends Controller
 {
     public function index(Request $request){
         $rules = [
-            'payload' => 'required',
-            'keyword' => 'max:50',
+            'payload' => 'required'
         ];
         $validator = Validator::make($request->all(),$rules);
         if ($validator->fails()) {
@@ -24,10 +23,9 @@ class PlayerController extends Controller
         }else{
             $payload = decodeToken($request);
             if(!$payload['error']){
-                $request = $payload['data'];
                 $keyword = null;
                 $per_page = 10;
-                if($request->per_page){
+                if(($request->per_page)){
                     $per_page = $request->per_page;
                 }
 
@@ -38,7 +36,7 @@ class PlayerController extends Controller
                     $query = $query->where('username', 'like', '%'.$request->keyword.'%');
                 }
         
-                $players = $query->paginate($request->per_page ? $request->per_page : 10);
+                $players = $query->paginate($request->per_page ? $request->per_page : $per_page);
 
                 return response()->json(
                     [
