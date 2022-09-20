@@ -52,7 +52,7 @@ class PlayerController extends Controller
                         'error' => true,
                         'message' => $payload['message'],
                     ], 
-                409);
+                401);
             }
         }           
     }
@@ -78,27 +78,35 @@ class PlayerController extends Controller
 
                 $query = $query->where('partner_id', $request->player_id);
 
-                if($request->status){
+                if(isset($request->status)){
                     $query = $query->where('status', $request->status);
                 }
 
                 $player = $query->first();
 
-                return response()->json(
-                    [
-                        'error' => false,
-                        'message' => 'success',
-                        'data' => $player,
-                    ], 
-                200);
-
+                if($player){
+                    return response()->json(
+                        [
+                            'error' => false,
+                            'message' => 'success',
+                            'data' => $player,
+                        ], 
+                    200);
+                }else{
+                    return response()->json(
+                        [
+                            'error' => true,
+                            'message' => 'Player not found!',
+                        ], 
+                    200);
+                }
             }else{
                 return response()->json(
                     [
                         'error' => true,
                         'message' => $payload['message'],
                     ], 
-                409);
+                401);
             }
         }
     }
