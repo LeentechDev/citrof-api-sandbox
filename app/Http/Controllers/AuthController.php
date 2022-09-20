@@ -4,13 +4,21 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Player;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use App\Models\ApiAccount;
 
+use Firebase\JWT\JWT;
 
 class AuthController extends Controller
 {
+
+    public function getToken(){
+        $app = ApiAccount::first();
+        $data = [
+            'player_id' => '08984',
+            'username' => 'Ronald Test'
+        ];
+        return JWT::encode($data, $app->secret, 'HS256');
+    }
 
     public function generateToken(Request $request){
         $payload = $request->payload;
