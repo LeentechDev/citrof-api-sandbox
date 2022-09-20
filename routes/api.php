@@ -22,18 +22,22 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
         Route::get('events', [App\Http\Controllers\EventController::class, 'getEvents'])->name('getEvents');
     });
+    // Route::group(['prefix' => 'player', 'middleware' => ['authorization']], function () {
+    //     Route::post('/list','App\Http\Controllers\PlayerController@get')->name('player_list');
+    //     Route::post('/details','App\Http\Controllers\PlayerController@details')->name('player_details');
+    // });
+    Route::group(['prefix' => 'player'], function () {
+        Route::post('/list','App\Http\Controllers\PlayerController@index')->name('player_list');
+        Route::post('/details','App\Http\Controllers\PlayerController@get')->name('player_details');
+    });
 
 });
 
-/* ========== for Facilito project purpose ========= */
 /* 
     add here the custom api 
 */
 Route::group(['prefix' => 'v2'], function () {
-
     Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
         Route::post('/generate-token', 'EntregoController@generateToken2')->name('generateToken2');
     });
-
-    
 });
