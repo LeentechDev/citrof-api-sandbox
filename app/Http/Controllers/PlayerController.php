@@ -24,7 +24,7 @@ class PlayerController extends Controller
                 ], 
             400);
         }else{
-            $payload = decodeToken($request->payload);
+            $payload = decodeToken($request);
             if(!$payload['error']){
                 $request = $payload['data'];
                 $keyword = null;
@@ -74,7 +74,7 @@ class PlayerController extends Controller
                 ], 
             400);
         }else{
-            $payload = decodeToken($request->payload);
+            $payload = decodeToken($request);
             if(!$payload['error']){
                 $request = $payload['data'];
 
