@@ -31,14 +31,20 @@ class Authorization
             if (!$validated) {
                 header('WWW-Authenticate: Basic realm="API Sandbox"');
                 header('HTTP/1.0 401 Unauthorized');
-                die ("Not authorized");
+                return response()->json(['error' => true,
+                    'message' => 'Not authorized',
+                    'reason' => "The authentication token doesn't match any of our authorized integrators. Please check if your username (App ID) and password is correct (Secret Key)"
+                ],401);
             }
 
             return $next($request);
         }else{
             header('WWW-Authenticate: Basic realm="API Sandbox"');
             header('HTTP/1.0 401 Unauthorized');
-            die ("Not authorized");
+            return response()->json(['error' => true,
+                'message' => 'Not authorized',
+                'reason' => "The authentication token doesn't match any of our authorized integrators. Please check if your username (App ID) and password is correct (Secret Key)"
+            ],401);
         }
     }
 }
