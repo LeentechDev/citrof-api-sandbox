@@ -14,8 +14,10 @@ class AuthController extends Controller
     public function getToken(){
         $app = ApiAccount::first();
         $data = [
-            'player_id' => '08984',
-            'username' => 'Ronald Test'
+            'event_id' => 16,
+            'no' => 1,
+            'status' => 'OPEN',
+            'betting_status' => ''
         ];
         return JWT::encode($data, $app->secret, 'HS256');
     }
@@ -30,23 +32,27 @@ class AuthController extends Controller
 
             $player = Player::where(['partner_id' => $request->player_id])->first();
 
-            if($player){
-                if($player->username == $request->username){
-                    $player->token = $token;
-                    $player->username = $request->username;
-                    $player->status = 'ACTIVE';
-                    $save = $player->save();
+            if($request->username && $request->player_id){
+                if($player){
+                    if($player->username == $request->username){
+                        $player->token = $token;
+                        $player->username = $request->username;
+                        $player->status = 'ACTIVE';
+                        $save = $player->save();
+                    }
+                }else{
+                    $save = Player::create([
+                        'created' => date('Y-m-d H:i:s'),
+                        'password' => $token,
+                        'token' => $token,
+                        'username' => $request->username,
+                        'partner_id' => $request->player_id,
+                        'jwt' => '',
+                        'status' => 'ACTIVE',
+                    ]);
                 }
             }else{
-                $save = Player::create([
-                    'created' => date('Y-m-d H:i:s'),
-                    'password' => $token,
-                    'token' => $token,
-                    'username' => $request->username,
-                    'partner_id' => $request->player_id,
-                    'jwt' => '',
-                    'status' => 'ACTIVE',
-                ]);
+                $response = [ 'error' => true, 'message' => 'Missing parameter! Please check all the coresponding parameter.' ];
             }
 
             if($save)

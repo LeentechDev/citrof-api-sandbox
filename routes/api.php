@@ -21,6 +21,8 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('getToken', [App\Http\Controllers\AuthController::class, 'getToken'])->name('getToken');
         Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
         Route::get('events', [App\Http\Controllers\EventController::class, 'getEvents'])->name('getEvents');
+        Route::get('event', [App\Http\Controllers\EventController::class, 'getEvent'])->name('getEvent');
+        Route::get('event-fights', [App\Http\Controllers\EventController::class, 'getEventFights'])->name('getEventFights');
     });
     // Route::group(['prefix' => 'player', 'middleware' => ['authorization']], function () {
     //     Route::post('/list','App\Http\Controllers\PlayerController@get')->name('player_list');
