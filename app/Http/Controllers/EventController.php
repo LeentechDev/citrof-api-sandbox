@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\Fight;
 
 class EventController extends Controller
 {
     public function getEvents(Request $request){
 
-        $data = decodeToken($request);
+        $limit = $request->limit ? $request->limit : 10;
 
+        $data = decodeToken($request);
         if(!$data['error']){
             $request = $data['data'];
 
@@ -18,18 +20,23 @@ class EventController extends Controller
                 if(isset($request->date)){
                     $q->where('date', $request->date);
                 }
-
+            })->where( function ($q) use ($request){
                 if(isset($request->status)){
-                    $q->where('status','=', $request->status);
+                    $statuses = explode(',', $request->status);
+                    for($i = 0; $i < count($statuses); $i++)
+                        $q->orWhere('status','=', $statuses[$i]);
                 }
-            })->paginate(isset($request->per_page) ? $request->per_page : 10 );
-            
+            })->paginate($limit);
+
+            /* $sql = $query->toSql();
+            $bindings = $query->getBindings();
+            var_dump($sql); die; */
 
             return response()->json(
                 [
                     'error' => false,
                     'message' => 'success',
-                    'events' => $events,
+                    'events' => formatDefaultPagination($events),
                 ], 
             200);
 
@@ -39,7 +46,7 @@ class EventController extends Controller
                     'error' => true,
                     'message' => $data['message']
                 ], 
-            409);
+            400);
         }
     }
 
@@ -49,16 +56,23 @@ class EventController extends Controller
 
         if(!$data['error']){
             $request = $data['data'];
-            $status_code = 409;
+            $status_code = 400;
 
             if(isset($request->id)){
                 $event = Event::find($request->id);
                 
-                $response = [
-                    'error' => false,
-                    'message' => 'success',
-                    'data' => $event,
-                ];
+                if($event){
+                    $response = [
+                        'error' => false,
+                        'message' => 'success',
+                        'data' => $event,
+                    ];
+                }else{
+                    $response = [
+                        'error' => true,
+                        'message' => 'Event not found',
+                    ];
+                }
                 $status_code = 200;
             }else{
                 $response = [
@@ -74,63 +88,7 @@ class EventController extends Controller
                     'error' => true,
                     'message' => $data['message']
                 ], 
-            409);
-        }
-    }
-
-
-    public function getEventFights(Request $request){
-
-        $data = decodeToken($request);
-
-        if(!$data['error']){
-            $request = $data['data'];
-            $status_code = 409;
-
-            if(isset($request->event_id)){
-                $event = Event::where('id', $request->event_id)->with('fights',
-                    function ($query) use ($request) {
-                        if(isset($request->no)){
-                            if($request->no){
-                                $query->where('no', $request->no);
-                            }
-                        }
-
-                        if(isset($request->status)){
-                            if($request->status){
-                                $query->where('status', $request->status);
-                            }
-                        }
-
-                        if(isset($request->betting_status)){
-                            if($request->betting_status){
-                                $query->where('betting_status', $request->betting_status);
-                            }
-                        }
-                        
-                    })->first();
-                
-                $response = [
-                    'error' => false,
-                    'message' => 'success',
-                    'data' => $event,
-                ];
-                $status_code = 200;
-            }else{
-                $response = [
-                    'error' => true,
-                    'message' => 'Missing Parameter ID',
-                ];
-            }
-            
-            return response()->json($response, $status_code);
-        }else{
-            return response()->json(
-                [
-                    'error' => true,
-                    'message' => $data['message']
-                ], 
-            409);
+            400);
         }
     }
 
