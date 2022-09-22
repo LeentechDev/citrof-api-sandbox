@@ -57,4 +57,11 @@ class Event extends Model
     ];
 
     protected $table = 'events';
+
+
+    public function fights()
+    {
+        return $this->hasMany(Fight::class);
+    }
+    
 }

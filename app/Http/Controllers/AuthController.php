@@ -32,23 +32,27 @@ class AuthController extends Controller
 
             $player = Player::where(['partner_id' => $request->player_id])->first();
 
-            if($player){
-                if($player->username == $request->username){
-                    $player->token = $token;
-                    $player->username = $request->username;
-                    $player->status = 'ACTIVE';
-                    $save = $player->save();
+            if($request->username && $request->player_id){
+                if($player){
+                    if($player->username == $request->username){
+                        $player->token = $token;
+                        $player->username = $request->username;
+                        $player->status = 'ACTIVE';
+                        $save = $player->save();
+                    }
+                }else{
+                    $save = Player::create([
+                        'created' => date('Y-m-d H:i:s'),
+                        'password' => $token,
+                        'token' => $token,
+                        'username' => $request->username,
+                        'partner_id' => $request->player_id,
+                        'jwt' => '',
+                        'status' => 'ACTIVE',
+                    ]);
                 }
             }else{
-                $save = Player::create([
-                    'created' => date('Y-m-d H:i:s'),
-                    'password' => $token,
-                    'token' => $token,
-                    'username' => $request->username,
-                    'partner_id' => $request->player_id,
-                    'jwt' => '',
-                    'status' => 'ACTIVE',
-                ]);
+                $response = [ 'error' => true, 'message' => 'Missing parameter! Please check all the coresponding parameter.' ];
             }
 
             if($save)
@@ -66,7 +70,7 @@ class AuthController extends Controller
                     'error' => true,
                     'message' => $data['message']
                 ], 
-            409);
+            400);
         }
     }
 }

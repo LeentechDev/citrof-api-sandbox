@@ -18,9 +18,13 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'v1'], function () {
 
     Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
-        Route::get('getToken', [App\Http\Controllers\AuthController::class, 'getToken'])->name('getToken');
         Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
-        Route::get('events', [App\Http\Controllers\EventController::class, 'getEvents'])->name('getEvents');
+        Route::post('events/list', [App\Http\Controllers\EventController::class, 'getEvents'])->name('getEvents');
+        Route::post('event/details', [App\Http\Controllers\EventController::class, 'getEvent'])->name('getEvent');
+        Route::post('event/fights', [App\Http\Controllers\FightController::class, 'getEventFights'])->name('getEventFights');
+        Route::post('fight/details', [App\Http\Controllers\FightController::class, 'getFight'])->name('geFight');
+        Route::post('bets/betting-table', [App\Http\Controllers\BetController::class, 'getBettingTable'])->name('getBettingTable');
+        Route::post('bets/list', [App\Http\Controllers\BetController::class, 'getBettingHistory'])->name('getBettingHistory');
     });
     // Route::group(['prefix' => 'player', 'middleware' => ['authorization']], function () {
     //     Route::post('/list','App\Http\Controllers\PlayerController@get')->name('player_list');
