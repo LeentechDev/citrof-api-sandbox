@@ -231,8 +231,7 @@ class LoadingController extends Controller
                 $request = (array)$payload['data'];
                 $rules = [
                     'player_id' => 'required',
-                    'amount' => 'required',
-                    'amount' => 'required',
+                    'amount' => 'required'
                 ];
                 $message = [
                     'player_id.required' => 'Player id is missing!',
@@ -255,23 +254,22 @@ class LoadingController extends Controller
                         ]);
                         if($update){
                             $idConfig = [
-                                'table' => 'player_loadings',
-                                'field' => 'transaction_no',
-                                'length' => 12,
-                                'prefix' => date('Y').'-'.date('m').'-'.date('d'),
+                                'table' => 'transactions',
+                                'field' => 'no',
+                                'length' => 15,
+                                'prefix' => 'T'.date('y').date('m').date('d'),
                                 'reset_on_prefix_change' => true
                             ];
-
-                            $player_loading = PlayerLoadings::create([
-                                'transaction_no' => IdGenerator::generate($idConfig),
+                            $transaction = Transaction::create([
+                                'no' => IdGenerator::generate($idConfig),
                                 'player_id' => $player->partner_id,
+                                'agent_id' => $player->agent_id,
+                                'type' => 'DEBIT',
                                 'amount' => $request['amount'],
-                                'previous_credits' => $player['credits'] - $request['amount'],
-                                'current_credits' => $player['credits'],
-                                'type' => 2,
+                                'previous_credit' => $player['credits'] + $request['amount'],
+                                'current_credit' => $player['credits'],
                                 'description' => 'Debit '. $request['amount']. ' for cashout request of user '. $player->partner_id
                             ]);
-                            $player_loading->save();
 
                             return response()->json(
                                 [
@@ -279,7 +277,7 @@ class LoadingController extends Controller
                                     'message' => 'success',
                                     'data' => [
                                         'credits' => $player->credits,
-                                        'description' => $player_loading->description,
+                                        'description' => $transaction->description,
                                     ]
                                 ], 
                             200);
