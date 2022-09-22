@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Validator;
 use App\Models\Player;
-use App\Models\PlayerLoadings;
+use App\Models\Transaction;
+use App\Models\Loading;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 
 class LoadingController extends Controller
@@ -51,34 +52,58 @@ class LoadingController extends Controller
                         ]);
                         if($update){
                             $idConfig = [
-                                'table' => 'player_loadings',
-                                'field' => 'transaction_no',
-                                'length' => 12,
-                                'prefix' => date('Y').'-'.date('m').'-'.date('d'),
+                                'table' => 'loadings',
+                                'field' => 'no',
+                                'length' => 15,
+                                'prefix' => 'L'.date('Y').date('m').date('d'),
                                 'reset_on_prefix_change' => true
                             ];
 
-                            $player_loading = PlayerLoadings::create([
-                                'transaction_no' => IdGenerator::generate($idConfig),
+                            $player_loading = Loading::create([
+                                'no' => IdGenerator::generate($idConfig),
                                 'player_id' => $player->partner_id,
                                 'amount' => $request['amount'],
-                                'previous_credits' => $player['credits'] - $request['amount'],
-                                'current_credits' => $player['credits'],
-                                'type' => 1,
-                                'description' => 'Added credit for loading user '. $player->username .' with the amount of '. $request['amount']
+                                'agent_id' => $player->agent_id,
+                                'weekly_summary_id' => 1,
+                                'description' => 'Added credit for loading user '. $player->partner_id .' with the amount of '. $request['amount']
                             ]);
-                            $player_loading->save();
-
-                            return response()->json(
-                                [
-                                    'error' => false,
-                                    'message' => 'success',
-                                    'data' => [
-                                        'credits' => $player->credits,
-                                        'description' => $player_loading->description,
-                                    ]
-                                ], 
-                            200);
+                            if($player_loading->save()){
+                                $idConfig = [
+                                    'table' => 'transactions',
+                                    'field' => 'no',
+                                    'length' => 15,
+                                    'prefix' => 'T'.date('y').date('m').date('d'),
+                                    'reset_on_prefix_change' => true
+                                ];
+                                $transaction = Transaction::create([
+                                    'no' => IdGenerator::generate($idConfig),
+                                    'player_id' => $player->partner_id,
+                                    'agent_id' => $player->agent_id,
+                                    'type' => 'CREDIT',
+                                    'loading_id' => $player_loading->id,
+                                    'amount' => $request['amount'],
+                                    'previous_credit' => $player['credits'] - $request['amount'],
+                                    'current_credit' => $player['credits'],
+                                    'description' => 'Added credit for loading user '. $player->partner_id .' with the amount of '. $request['amount']
+                                ]);
+                                return response()->json(
+                                    [
+                                        'error' => false,
+                                        'message' => 'success',
+                                        'data' => [
+                                            'credits' => $player->credits,
+                                            'description' => $transaction->description,
+                                        ]
+                                    ], 
+                                200);
+                            }else{
+                                return response()->json(
+                                    [
+                                        'error' => true,
+                                        'message' => 'Something went wrong!',
+                                    ], 
+                                200);
+                            }                            
                         }else{
                             return response()->json(
                                 [
