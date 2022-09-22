@@ -23,26 +23,21 @@ class PlayerController extends Controller
         }else{
             $payload = decodeToken($request);
             if(!$payload['error']){
-                $keyword = null;
-                $per_page = 10;
-                if(($request->per_page)){
-                    $per_page = $request->per_page;
-                }
+                $payload = $payload['data'];
 
                 $query = Player::query();
 
-                if ($request->keyword) {
-                    $keyword = $request->keyword;
-                    $query = $query->where('username', 'like', '%'.$request->keyword.'%');
+                if (isset($payload->username)) {
+                    $query = $query->where('username', 'like', '%'.$payload->username.'%');
                 }
         
-                $players = $query->paginate($request->per_page ? $request->per_page : $per_page);
+                $players = $query->paginate($request->limit ? $request->limit : 10);
 
                 return response()->json(
                     [
                         'error' => false,
                         'message' => 'success',
-                        'players' => $players,
+                        'players' => formatDefaultPagination($players),
                     ], 
                 200);
 
