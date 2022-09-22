@@ -132,7 +132,7 @@ class LoadingController extends Controller
         }
     }
     
-    public function index(Request $request){
+    public function getCashinHistory(Request $request){
         $rules = [
             'payload' => 'required'
         ];
@@ -150,14 +150,11 @@ class LoadingController extends Controller
                 $payload = (array)$payload['data'];
                 $rules = [
                     'player_id' => 'required',
-                    'type' => 'required|integer',
                     'date_from' => 'nullable|date',
                     'date_to' => 'nullable|date',
                 ];
                 $message = [
                     'player_id.required' => 'Player id is missing!',
-                    'type.required' => 'Loading type is missing!',
-                    'type.integer' => 'Loading type must be integer!',
                     'date_from.date' => 'Date from must be a date format!',
                     'date_to.date' => 'Date to must be a date format!',
                 ];
@@ -177,27 +174,27 @@ class LoadingController extends Controller
                         $per_page = $request->per_page;
                     }
     
-                    $query = PlayerLoadings::query();
+                    $query = Loading::query();
 
-                    $query = $query->where('player_id', $payload['player_id'])->where('type', $payload['type']);
+                    $query = $query->where('player_id', $payload['player_id']);
 
                     if (isset($payload['transaction_no'])) {
                         $transaction_no = $payload['transaction_no'];
-                        $query = $query->where('transaction_no', 'like', '%'.$payload['transaction_no'].'%');
+                        $query = $query->where('no', 'like', '%'.$payload['transaction_no'].'%');
                     }
 
                     if (isset($payload['date_from']) && isset($payload['date_to'])) {
-                        $query = $query->whereDate('created_at', '>=', $payload['date_from'])
-                        ->whereDate('created_at', '<=', $payload['date_to']);
+                        $query = $query->whereDate('created', '>=', $payload['date_from'])
+                        ->whereDate('created', '<=', $payload['date_to']);
                     }
             
-                    $loading_history = $query->paginate($request->per_page ? $request->per_page : $per_page);
+                    $cashin_history = $query->paginate($request->per_page ? $request->per_page : $per_page);
     
                     return response()->json(
                         [
                             'error' => false,
                             'message' => 'success',
-                            'loading_history' => $loading_history,
+                            'cashin_history' => $cashin_history,
                         ], 
                     200);
                 }

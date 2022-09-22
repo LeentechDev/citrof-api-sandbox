@@ -34,6 +34,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'load'], function () {
         Route::post('/history','App\Http\Controllers\LoadingController@index')->name('load_history');
         Route::post('/cashin','App\Http\Controllers\LoadingController@cash_in')->name('player_cashin');
+        Route::post('/cashin/history','App\Http\Controllers\LoadingController@getCashinHistory')->name('getCashinHistory');
         Route::post('/cashout','App\Http\Controllers\LoadingController@cash_out')->name('player_cashout');
     });
 
