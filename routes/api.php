@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Route;
 /* ========== add here all the base api ========= */
 Route::group(['prefix' => 'v1'], function () {
 
+    Route::get('getToken', [App\Http\Controllers\AuthController::class, 'getToken'])->name('getToken');
     Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
         Route::post('generate-token', [App\Http\Controllers\AuthController::class, 'generateToken'])->name('generateToken');
         Route::post('events/list', [App\Http\Controllers\EventController::class, 'getEvents'])->name('getEvents');
@@ -26,10 +27,6 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('bets/betting-table', [App\Http\Controllers\BetController::class, 'getBettingTable'])->name('getBettingTable');
         Route::post('bets/list', [App\Http\Controllers\BetController::class, 'getBettingHistory'])->name('getBettingHistory');
     });
-    // Route::group(['prefix' => 'player', 'middleware' => ['authorization']], function () {
-    //     Route::post('/list','App\Http\Controllers\PlayerController@get')->name('player_list');
-    //     Route::post('/details','App\Http\Controllers\PlayerController@details')->name('player_details');
-    // });
     Route::group(['prefix' => 'player'], function () {
         Route::post('/list','App\Http\Controllers\PlayerController@index')->name('player_list');
         Route::post('/details','App\Http\Controllers\PlayerController@get')->name('player_details');
@@ -37,6 +34,7 @@ Route::group(['prefix' => 'v1'], function () {
     Route::group(['prefix' => 'load'], function () {
         Route::post('/history','App\Http\Controllers\LoadingController@index')->name('load_history');
         Route::post('/cashin','App\Http\Controllers\LoadingController@cash_in')->name('player_cashin');
+        Route::post('/cashout','App\Http\Controllers\LoadingController@cash_out')->name('player_cashout');
     });
 
 });
