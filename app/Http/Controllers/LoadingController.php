@@ -150,13 +150,13 @@ class LoadingController extends Controller
                 $payload = (array)$payload['data'];
                 $rules = [
                     'player_id' => 'required',
-                    'date_from' => 'nullable|date',
-                    'date_to' => 'nullable|date',
+                    'from_date' => 'nullable|date',
+                    'to_date' => 'nullable|date',
                 ];
                 $message = [
                     'player_id.required' => 'Player id is missing!',
-                    'date_from.date' => 'Date from must be a date format!',
-                    'date_to.date' => 'Date to must be a date format!',
+                    'from_date.date' => 'Date from must be a date format!',
+                    'to_date.date' => 'Date to must be a date format!',
                 ];
 
                 $validator = Validator::make($payload,$rules,$message);
@@ -169,10 +169,6 @@ class LoadingController extends Controller
                     400);
                 }else{
                     $keyword = null;
-                    $per_page = 10;
-                    if(($request->per_page)){
-                        $per_page = $request->per_page;
-                    }
     
                     $query = Loading::query();
 
@@ -183,18 +179,18 @@ class LoadingController extends Controller
                         $query = $query->where('no', 'like', '%'.$payload['transaction_no'].'%');
                     }
 
-                    if (isset($payload['date_from']) && isset($payload['date_to'])) {
-                        $query = $query->whereDate('created', '>=', $payload['date_from'])
-                        ->whereDate('created', '<=', $payload['date_to']);
+                    if (isset($payload['from_date']) && isset($payload['to_date'])) {
+                        $query = $query->whereDate('created', '>=', $payload['from_date'])
+                        ->whereDate('created', '<=', $payload['to_date']);
                     }
             
-                    $cashin_history = $query->paginate($request->per_page ? $request->per_page : $per_page);
+                    $cashin_history = $query->paginate($request->limit ? $request->limit : 10);
     
                     return response()->json(
                         [
                             'error' => false,
                             'message' => 'success',
-                            'cashin_history' => $cashin_history,
+                            'cashin_history' => formatDefaultPagination($cashin_history),
                         ], 
                     200);
                 }
@@ -324,13 +320,13 @@ class LoadingController extends Controller
                 $payload = (array)$payload['data'];
                 $rules = [
                     'player_id' => 'required',
-                    'date_from' => 'nullable|date',
-                    'date_to' => 'nullable|date',
+                    'from_date' => 'nullable|date',
+                    'to_date' => 'nullable|date',
                 ];
                 $message = [
                     'player_id.required' => 'Player id is missing!',
-                    'date_from.date' => 'Date from must be a date format!',
-                    'date_to.date' => 'Date to must be a date format!',
+                    'from_date.date' => 'Date from must be a date format!',
+                    'to_date.date' => 'Date to must be a date format!',
                 ];
 
                 $validator = Validator::make($payload,$rules,$message);
@@ -341,35 +337,28 @@ class LoadingController extends Controller
                             'message' => $validator->errors()->first()
                         ], 
                     400);
-                }else{
-                    $keyword = null;
-                    $per_page = 10;
-                    if(($request->per_page)){
-                        $per_page = $request->per_page;
-                    }
-    
+                }else{    
                     $query = Transaction::query();
-                    $query = $query->where('type', 'DEBIT');
 
-                    $query = $query->where('player_id', $payload['player_id']);
+                    $query = $query->where('type', 'DEBIT')->where('player_id', $payload['player_id']);
 
                     if (isset($payload['transaction_no'])) {
                         $transaction_no = $payload['transaction_no'];
                         $query = $query->where('no', 'like', '%'.$payload['transaction_no'].'%');
                     }
 
-                    if (isset($payload['date_from']) && isset($payload['date_to'])) {
-                        $query = $query->whereDate('created', '>=', $payload['date_from'])
-                        ->whereDate('created', '<=', $payload['date_to']);
+                    if (isset($payload['from_date']) && isset($payload['to_date'])) {
+                        $query = $query->whereDate('created', '>=', $payload['from_date'])
+                        ->whereDate('created', '<=', $payload['to_date']);
                     }
             
-                    $cash_out_history = $query->paginate($request->per_page ? $request->per_page : $per_page);
+                    $cash_out_history = $query->paginate($request->limit ? $request->limit : 10);
     
                     return response()->json(
                         [
                             'error' => false,
                             'message' => 'success',
-                            'cash_out_history' => $cash_out_history,
+                            'cash_out_history' => formatDefaultPagination($cash_out_history),
                         ], 
                     200);
                 }

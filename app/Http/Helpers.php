@@ -10,6 +10,7 @@ if (!function_exists('formatDefaultPagination')) {
         $data = $data->toArray();
         $data['total_records'] = $data['total'];
         $data['total_pages'] = $data['last_page'];
+        $data['limit'] = $data['per_page'];
         unset($data['first_page_url']);
         unset($data['last_page_url']);
         unset($data['from']);
@@ -20,6 +21,7 @@ if (!function_exists('formatDefaultPagination')) {
         unset($data['to']);
         unset($data['total']);
         unset($data['last_page']);
+        unset($data['per_page']);
         return $data;
     }
 }
