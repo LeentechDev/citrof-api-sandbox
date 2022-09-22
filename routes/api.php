@@ -27,14 +27,16 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('bets/betting-table', [App\Http\Controllers\BetController::class, 'getBettingTable'])->name('getBettingTable');
         Route::post('bets/list', [App\Http\Controllers\BetController::class, 'getBettingHistory'])->name('getBettingHistory');
     });
-    Route::group(['prefix' => 'player'], function () {
-        Route::post('/list','App\Http\Controllers\PlayerController@index')->name('player_list');
-        Route::post('/details','App\Http\Controllers\PlayerController@get')->name('player_details');
-        Route::post('/cashin','App\Http\Controllers\LoadingController@cash_in')->name('player_cashin');
-        Route::post('/cashout','App\Http\Controllers\LoadingController@cash_out')->name('player_cashout');
+    Route::group(['middleware' => ['authorization']], function () {
+        Route::group(['prefix' => 'player'], function () {
+            Route::post('/list','App\Http\Controllers\PlayerController@index')->name('player_list');
+            Route::post('/details','App\Http\Controllers\PlayerController@get')->name('player_details');
+            Route::post('/cashin','App\Http\Controllers\LoadingController@cash_in')->name('player_cashin');
+            Route::post('/cashout','App\Http\Controllers\LoadingController@cash_out')->name('player_cashout');
+        });
+        Route::post('/cashin/history','App\Http\Controllers\LoadingController@getCashinHistory')->name('getCashinHistory');
+        Route::post('/cashout/history','App\Http\Controllers\LoadingController@getCashoutHistory')->name('getCashoutHistory');
     });
-    Route::post('/cashin/history','App\Http\Controllers\LoadingController@getCashinHistory')->name('getCashinHistory');
-    Route::post('/cashout/history','App\Http\Controllers\LoadingController@getCashoutHistory')->name('getCashoutHistory');
 
 });
 
