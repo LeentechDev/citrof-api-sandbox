@@ -3,50 +3,41 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Player;
-use Firebase\JWT\Key;
 use Validator;
 
 class PlayerController extends Controller
 {
     public function index(Request $request){
         $rules = [
-            'payload' => 'required',
-            'keyword' => 'max:50',
+            'payload' => 'required'
         ];
         $validator = Validator::make($request->all(),$rules);
         if ($validator->fails()) {
             return response()->json(
                 [
                     'error' => true,
-                    'message' => 'Invalid request parameters'
+                    'message' => 'Payload is missing'
                 ], 
             400);
         }else{
-            $payload = decodeToken($request->payload);
+            $payload = decodeToken($request);
             if(!$payload['error']){
-                $request = $payload['data'];
-                $keyword = null;
-                $per_page = 10;
-                if($request->per_page){
-                    $per_page = $request->per_page;
-                }
+                $payload = $payload['data'];
 
                 $query = Player::query();
 
-                if ($request->keyword) {
-                    $keyword = $request->keyword;
-                    $query = $query->where('username', 'like', '%'.$request->keyword.'%');
+                if (isset($payload->username)) {
+                    $query = $query->where('username', 'like', '%'.$payload->username.'%');
                 }
         
-                $players = $query->paginate($request->per_page ? $request->per_page : 10);
+                $players = $query->paginate($request->limit ? $request->limit : 10);
 
                 return response()->json(
                     [
                         'error' => false,
                         'message' => 'success',
-                        'players' => $players,
+                        'players' => formatDefaultPagination($players),
                     ], 
                 200);
 
@@ -56,7 +47,7 @@ class PlayerController extends Controller
                         'error' => true,
                         'message' => $payload['message'],
                     ], 
-                409);
+                401);
             }
         }           
     }
@@ -70,11 +61,11 @@ class PlayerController extends Controller
             return response()->json(
                 [
                     'error' => true,
-                    'message' => 'Invalid request parameters'
+                    'message' => 'Payload is missing'
                 ], 
             400);
         }else{
-            $payload = decodeToken($request->payload);
+            $payload = decodeToken($request);
             if(!$payload['error']){
                 $request = $payload['data'];
 
@@ -82,27 +73,35 @@ class PlayerController extends Controller
 
                 $query = $query->where('partner_id', $request->player_id);
 
-                if($request->status){
+                if(isset($request->status)){
                     $query = $query->where('status', $request->status);
                 }
 
                 $player = $query->first();
 
-                return response()->json(
-                    [
-                        'error' => false,
-                        'message' => 'success',
-                        'data' => $player,
-                    ], 
-                200);
-
+                if($player){
+                    return response()->json(
+                        [
+                            'error' => false,
+                            'message' => 'success',
+                            'data' => $player,
+                        ], 
+                    200);
+                }else{
+                    return response()->json(
+                        [
+                            'error' => true,
+                            'message' => 'Player not found!',
+                        ], 
+                    200);
+                }
             }else{
                 return response()->json(
                     [
                         'error' => true,
                         'message' => $payload['message'],
                     ], 
-                409);
+                401);
             }
         }
     }

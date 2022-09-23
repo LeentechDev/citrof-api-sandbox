@@ -11,6 +11,17 @@ use Firebase\JWT\JWT;
 class AuthController extends Controller
 {
 
+    public function getToken(){
+        $app = ApiAccount::first();
+        $data = [
+            'player_id' => 2022090905,
+            'type' => 1,
+            // 'date_from' => '2022-09-22',
+            // 'date_to' => '2022-09-22',
+        ];
+        return JWT::encode($data, $app->secret, 'HS256');
+    }
+
     public function generateToken(Request $request){
 
         $data = decodeToken($request);
