@@ -24,7 +24,7 @@ class EventController extends Controller
                 if(isset($request->status)){
                     $statuses = explode(',', $request->status);
                     for($i = 0; $i < count($statuses); $i++)
-                        $q->orWhere('status','=', $statuses[$i]);
+                        $q->orWhere('status','=', trim($statuses[$i]));
                 }
             })->paginate($limit);
 
