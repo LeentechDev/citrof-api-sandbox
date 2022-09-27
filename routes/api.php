@@ -26,7 +26,11 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('fight/details', [App\Http\Controllers\FightController::class, 'getFight'])->name('geFight');
         Route::post('bets/betting-table', [App\Http\Controllers\BetController::class, 'getBettingTable'])->name('getBettingTable');
         Route::post('bets/list', [App\Http\Controllers\BetController::class, 'getBettingHistory'])->name('getBettingHistory');
+        
+        Route::post('transaction/list', [App\Http\Controllers\TransactionController::class, 'getPlayerTransactions'])->name('getPlayerTransactions');
+        Route::post('logs/list', [App\Http\Controllers\LogController::class, 'getPlayerLogs'])->name('getPlayerLogs');
     });
+
     Route::group(['middleware' => ['authorization']], function () {
         Route::group(['prefix' => 'player'], function () {
             Route::post('/list','App\Http\Controllers\PlayerController@index')->name('player_list');
