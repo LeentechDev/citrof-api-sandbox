@@ -92,7 +92,7 @@ class BetController extends Controller
                         if(isset($request->result)){
                             $results = explode(',', $request->result);
                             for($i = 0; $i < count($results); $i++)
-                                $q->orWhere('result', $results[$i]);
+                                $q->orWhere('result', trim($results[$i]));
                         }
                     })->paginate($limit);
                 

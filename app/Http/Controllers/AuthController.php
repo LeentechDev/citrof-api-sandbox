@@ -47,7 +47,6 @@ class AuthController extends Controller
                         'token' => $token,
                         'username' => $request->username,
                         'partner_id' => $request->player_id,
-                        'jwt' => '',
                         'status' => 'ACTIVE',
                     ]);
                 }

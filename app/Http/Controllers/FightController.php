@@ -29,13 +29,13 @@ class FightController extends Controller
                         if(isset($request->status)){
                             $statuses = explode(',', $request->status);
                             for($i = 0; $i < count($statuses); $i++)
-                                $q->orWhere('status','=', $statuses[$i]);
+                                $q->orWhere('status','=', trim($statuses[$i]));
                         }
                     })->where( function ($q) use ($request){
                         if(isset($request->betting_status)){
                             $statuses = explode(',', $request->betting_status);
                             for($i = 0; $i < count($statuses); $i++)
-                                $q->orWhere('betting_status','=', $statuses[$i]);
+                                $q->orWhere('betting_status','=', trim($statuses[$i]));
                         }
                     })
                     ->paginate($limit);
