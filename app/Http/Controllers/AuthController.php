@@ -37,6 +37,7 @@ class AuthController extends Controller
                     if($player->username == $request->username){
                         $player->token = $token;
                         $player->username = $request->username;
+                        $player->jwt = $request->token;
                         $player->status = 'ACTIVE';
                         $save = $player->save();
                     }
@@ -46,6 +47,7 @@ class AuthController extends Controller
                         'password' => $token,
                         'token' => $token,
                         'username' => $request->username,
+                        'jwt' => $request->token,
                         'partner_id' => $request->player_id,
                         'status' => 'ACTIVE',
                     ]);
