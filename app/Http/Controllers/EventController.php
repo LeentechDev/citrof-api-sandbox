@@ -116,8 +116,8 @@ class EventController extends Controller
                     'to_date' => 'nullable|date',
                 ];
                 $message = [
-                    'from_date.date' => 'Date from must be a date format!',
-                    'to_date.date' => 'Date to must be a date format!',
+                    'from_date.date' => 'Invalid date format!',
+                    'to_date.date' => 'Invalid date format!',
                 ];
 
                 $validator = Validator::make($request,$rules,$message);
