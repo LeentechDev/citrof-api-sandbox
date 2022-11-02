@@ -17,9 +17,8 @@ class AuthController extends Controller
     public function getToken(){
         $app = ApiAccount::first();
         $data = [
-            'operator' => 'beton',
-            'username' => 'player_jm',
-            'player_id' => 22102801,
+            'from_date' => '2022-09-01',
+            'to_date' => '2022-09-30',
         ];
         return JWT::encode($data, $app->secret, 'HS256');
     }

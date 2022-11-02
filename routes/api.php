@@ -40,6 +40,7 @@ Route::group(['prefix' => 'v1'], function () {
         });
         Route::post('/cashin/history','App\Http\Controllers\LoadingController@getCashinHistory')->name('getCashinHistory');
         Route::post('/cashout/history','App\Http\Controllers\LoadingController@getCashoutHistory')->name('getCashoutHistory');
+        Route::post('/event/rake','App\Http\Controllers\EventController@getRake')->name('event_rake');
     });
 
 });
