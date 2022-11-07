@@ -155,8 +155,8 @@ class LoadingController extends Controller
                 ];
                 $message = [
                     'player_id.required' => 'Player id is missing!',
-                    'from_date.date' => 'Date from must be a date format!',
-                    'to_date.date' => 'Date to must be a date format!',
+                    'from_date.date' => 'Invalid date format!',
+                    'to_date.date' => 'Invalid date format!',
                 ];
 
                 $validator = Validator::make($payload,$rules,$message);
@@ -325,8 +325,8 @@ class LoadingController extends Controller
                 ];
                 $message = [
                     'player_id.required' => 'Player id is missing!',
-                    'from_date.date' => 'Date from must be a date format!',
-                    'to_date.date' => 'Date to must be a date format!',
+                    'from_date.date' => 'Invalid date format!',
+                    'to_date.date' => 'Invalid date format!',
                 ];
 
                 $validator = Validator::make($payload,$rules,$message);

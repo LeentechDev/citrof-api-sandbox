@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Player;
+use App\Models\Agent;
 use App\Models\ApiAccount;
+use Illuminate\Support\Facades\Hash;
+use Haruncpi\LaravelIdGenerator\IdGenerator;
 
 use Firebase\JWT\JWT;
 
@@ -14,10 +17,8 @@ class AuthController extends Controller
     public function getToken(){
         $app = ApiAccount::first();
         $data = [
-            'player_id' => 2022090905,
-            'type' => 1,
-            // 'date_from' => '2022-09-22',
-            // 'date_to' => '2022-09-22',
+            'from_date' => '2022-09-01',
+            'to_date' => '2022-09-30',
         ];
         return JWT::encode($data, $app->secret, 'HS256');
     }
@@ -32,23 +33,46 @@ class AuthController extends Controller
 
             $player = Player::where(['partner_id' => $request->player_id])->first();
 
-            if($request->username && $request->player_id){
+            if($request->username && $request->player_id && $request->operator){
                 if($player){
-                    if($player->username == $request->username){
-                        $player->token = $token;
-                        $player->username = $request->username;
-                        $player->status = 'ACTIVE';
-                        $save = $player->save();
+                    $agent = Agent::where('username' , 'cg_'.$request->operator)->first();
+                    if(!$agent){
+                        $agent = $this->addAgent($request);
                     }
+
+                    if($player->agent_username != $agent->username){
+                        $player->agent_id = $agent->id;
+                        $player->agent_username = $agent->username;
+                    }
+                    $player->token = $token;
+                    $player->username = $request->username;
+                    $save = $player->save();
+
                 }else{
+                    $agent = Agent::where('username' , 'cg_'.$request->operator)->first();
+                    if(!$agent){
+                        $agent = $this->addAgent($request);
+                    }
+                    $player_acc_no = [
+                        'table' => 'players',
+                        'field' => 'account_no',
+                        'length' => 9,
+                        'prefix' => 'A'.date('y').date('m').date('d'),
+                        'reset_on_prefix_change' => true
+                    ];
                     $save = Player::create([
-                        'created' => date('Y-m-d H:i:s'),
-                        'password' => $token,
-                        'token' => $token,
                         'username' => $request->username,
                         'partner_id' => $request->player_id,
+                        'password' => $token,
+                        'token' => $token,
                         'status' => 'ACTIVE',
+                        'email_verified' => 'YES',
+                        'agent_id' => $agent->id,
+                        'agent_username' => $agent->username,
+                        'agent_level' => $agent->level,
+                        'account_no' => IdGenerator::generate($player_acc_no),
                     ]);
+
                 }
             }else{
                 $response = [ 'error' => true, 'message' => 'Missing parameter! Please check all the coresponding parameter.' ];
@@ -71,5 +95,34 @@ class AuthController extends Controller
                 ], 
             400);
         }
+    }
+
+    public function addAgent($request){
+        $agent_acc_no = [
+            'table' => 'agents',
+            'field' => 'account_no',
+            'length' => 10,
+            'prefix' => 'CG'.date('y').date('m').date('d'),
+            'reset_on_prefix_change' => true
+        ];
+        $referral_id = [
+            'table' => 'agents',
+            'field' => 'referral_id',
+            'length' => 6,
+            'prefix' => 'R-',
+            'reset_on_prefix_change' => true
+        ];
+        $agent = Agent::create([
+            'username' => 'cg_'.$request->operator,
+            'account_no' => IdGenerator::generate($agent_acc_no),
+            'referral_id' => IdGenerator::generate($referral_id),
+            'password' => Hash::make('change_me'),
+            'ma_convention' => 'cg_'.substr($request->operator, 0, 4),
+            'commission_rate' => 4.0,
+            'level' => 1,
+            'status' => 'ACTIVE', 
+        ]);
+
+        return $agent;
     }
 }
