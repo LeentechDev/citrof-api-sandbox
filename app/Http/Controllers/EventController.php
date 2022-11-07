@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Event;
 use App\Models\Fight;
+use App\Models\Bet;
+use Validator;
+use Illuminate\Support\Facades\DB;
 
 class EventController extends Controller
 {
@@ -89,6 +92,76 @@ class EventController extends Controller
                     'message' => $data['message']
                 ], 
             400);
+        }
+    }
+
+    public function getRake(Request $request){
+        $rules = [
+            'payload' => 'required',
+        ];
+        $validator = Validator::make($request->all(),$rules);
+        if ($validator->fails()) {
+            return response()->json(
+                [
+                    'error' => true,
+                    'message' => 'Payload is missing'
+                ], 
+            400);
+        }else{
+            $payload = decodeToken($request);
+            if(!$payload['error']){
+                $request = (array)$payload['data'];
+                $rules = [
+                    'from_date' => 'nullable|date',
+                    'to_date' => 'nullable|date',
+                ];
+                $message = [
+                    'from_date.date' => 'Invalid date format!',
+                    'to_date.date' => 'Invalid date format!',
+                ];
+
+                $validator = Validator::make($request,$rules,$message);
+                if ($validator->fails()) {
+                    return response()->json(
+                        [
+                            'error' => true,
+                            'message' => $validator->errors()->first()
+                        ], 
+                    400);
+                }else{
+                    $query = Bet::query();
+                    $query = $query
+                            ->select('created as Event date', 'event_id as Event id', DB::raw('SUM(rake) as `Total Rake`'))
+                            ->where('result', 'WIN')
+                            ->groupBy('event_id')
+                            ->orderBy('Total Rake' , 'DESC');
+
+                    if (isset($request['from_date']) && isset($request['to_date'])) {
+                        $query = $query->whereDate('created', '>=', $request['from_date'])
+                        ->whereDate('created', '<=', $request['to_date']);
+                    }else{
+                        $query = $query->whereDate('created', '>=', date('Y-m-01'))
+                        ->whereDate('created', '<=', date('Y-m-t'));
+                    }
+            
+                    $total_rake = $query->get();
+    
+                    return response()->json(
+                        [
+                            'error' => false,
+                            'message' => 'success',
+                            'data' => $total_rake,
+                        ], 
+                    200);
+                }
+            }else{
+                return response()->json(
+                    [
+                        'error' => true,
+                        'message' => $payload['message'],
+                    ], 
+                401);
+            }
         }
     }
 
