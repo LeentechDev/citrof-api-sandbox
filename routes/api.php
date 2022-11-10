@@ -45,12 +45,3 @@ Route::group(['prefix' => 'v1'], function () {
     });
 
 });
-
-/* 
-    add here the custom api 
-*/
-Route::group(['prefix' => 'v2'], function () {
-    Route::group(['prefix' => '', 'middleware' => ['authorization']], function () {
-        Route::post('/generate-token', 'EntregoController@generateToken2')->name('generateToken2');
-    });
-});

@@ -17,8 +17,9 @@ class AuthController extends Controller
     public function getToken(){
         $app = ApiAccount::first();
         $data = [
-            'from_date' => '2022-09-01',
-            'to_date' => '2022-09-30',
+            'operator' => 'lns',
+            'username' => 'player_erika',
+            'player_id' => 221110001,
         ];
         return JWT::encode($data, $app->secret, 'HS256');
     }
@@ -38,6 +39,10 @@ class AuthController extends Controller
                     $agent = Agent::where('username' , 'cg_'.$request->operator)->first();
                     if(!$agent){
                         $agent = $this->addAgent($request);
+                    }else{
+                        $agent->username = strtolower($agent->username);
+                        $agent->ma_convention = strtolower($agent->ma_convention);
+                        $agent->save();
                     }
 
                     if($player->agent_username != $agent->username){
@@ -113,11 +118,11 @@ class AuthController extends Controller
             'reset_on_prefix_change' => true
         ];
         $agent = Agent::create([
-            'username' => 'cg_'.$request->operator,
+            'username' => 'cg_'.strtolower($request->operator),
             'account_no' => IdGenerator::generate($agent_acc_no),
             'referral_id' => IdGenerator::generate($referral_id),
             'password' => Hash::make('change_me'),
-            'ma_convention' => 'cg_'.substr($request->operator, 0, 4),
+            'ma_convention' => 'cg_'.substr(strtolower($request->operator), 0, 4),
             'commission_rate' => 4.0,
             'level' => 1,
             'status' => 'ACTIVE', 
