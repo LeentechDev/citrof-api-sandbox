@@ -45,6 +45,11 @@ class AuthController extends Controller
                     $agent = Agent::where('username' , 'cg_'.$operator)->first();
                     if(!$agent){
                         $agent = $this->addAgent($request);
+                    }else{
+                        $agent->username = strtolower($agent->username);
+                        $agent->ma_convention = strtolower($agent->ma_convention);
+                        $agent->commission_rate = 5.0;
+                        $agent->save();
                     }
 
                     if($player->agent_username != $agent->username){
@@ -125,7 +130,7 @@ class AuthController extends Controller
             'referral_id' => IdGenerator::generate($referral_id),
             'password' => Hash::make('change_me'),
             'ma_convention' => 'cg_'.substr($request->operator, 0, 4),
-            'commission_rate' => 4.0,
+            'commission_rate' => 5.0,
             'level' => 1,
             'status' => 'ACTIVE', 
         ]);
