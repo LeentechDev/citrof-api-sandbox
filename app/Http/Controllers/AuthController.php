@@ -64,6 +64,11 @@ class AuthController extends Controller
                     $agent = Agent::where('username' , 'cg_'.$operator)->first();
                     if(!$agent){
                         $agent = $this->addAgent($request);
+                    }else{
+                        $agent->username = strtolower($agent->username);
+                        $agent->ma_convention = strtolower($agent->ma_convention);
+                        $agent->commission_rate = 5.0;
+                        $agent->save();
                     }
                     $player_acc_no = [
                         'table' => 'players',
