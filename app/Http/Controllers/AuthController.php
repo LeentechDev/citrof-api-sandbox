@@ -31,11 +31,18 @@ class AuthController extends Controller
 
             $token = substr(str_shuffle( 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@$'), 0, 100);
 
-            $player = Player::where(['partner_id' => $request->player_id])->first();
+            
 
-            if($request->username && $request->player_id && $request->operator){
+            if(isset($request->username) && isset($request->player_id)){
+                $player = Player::where(['partner_id' => $request->player_id])->first();
+                
+                $operator = 'default';
+                if(isset($request->operator)){
+                    $operator = $request->operator;
+                }
+
                 if($player){
-                    $agent = Agent::where('username' , 'cg_'.$request->operator)->first();
+                    $agent = Agent::where('username' , 'cg_'.$operator)->first();
                     if(!$agent){
                         $agent = $this->addAgent($request);
                     }
@@ -49,7 +56,7 @@ class AuthController extends Controller
                     $save = $player->save();
 
                 }else{
-                    $agent = Agent::where('username' , 'cg_'.$request->operator)->first();
+                    $agent = Agent::where('username' , 'cg_'.$operator)->first();
                     if(!$agent){
                         $agent = $this->addAgent($request);
                     }
