@@ -26,7 +26,6 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('fight/details', [App\Http\Controllers\FightController::class, 'getFight'])->name('geFight');
         Route::post('bets/betting-table', [App\Http\Controllers\BetController::class, 'getBettingTable'])->name('getBettingTable');
         Route::post('bets/list', [App\Http\Controllers\BetController::class, 'getBettingHistory'])->name('getBettingHistory');
-        
         Route::post('transaction/list', [App\Http\Controllers\TransactionController::class, 'getPlayerTransactions'])->name('getPlayerTransactions');
         Route::post('logs/list', [App\Http\Controllers\LogController::class, 'getPlayerLogs'])->name('getPlayerLogs');
     });
@@ -42,6 +41,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('/cashin/history','App\Http\Controllers\LoadingController@getCashinHistory')->name('getCashinHistory');
         Route::post('/cashout/history','App\Http\Controllers\LoadingController@getCashoutHistory')->name('getCashoutHistory');
         Route::post('/event/rake','App\Http\Controllers\EventController@getRake')->name('event_rake');
+        Route::post('bets-rake/list', 'App\Http\Controllers\BetController@getBetRakeHistory')->name('getBetRakeHistory');
     });
 
 });
