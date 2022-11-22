@@ -144,12 +144,6 @@ class BetController extends Controller
                             $query->where('event_id', $request->event_id);
                         }
                     }
-                })->where( function ($q) use ($request){
-                    if(isset($request->result)){
-                        $results = explode(',', $request->result);
-                        for($i = 0; $i < count($results); $i++)
-                            $q->orWhere('result', trim($results[$i]));
-                    }
                 })
                 ->with(['player' => function ($query) {
                     $query->select('id','partner_id as player_id','account_no','username', 'credits');
