@@ -20,7 +20,7 @@ class Authorization
         $app = ApiAccount::first();
 
         if(isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])){
-            $valid_passwords = array ($app->app_id => $app->secret);
+            $valid_passwords = array ($app->app_id => $app->authorization);
             $valid_users = array_keys($valid_passwords);
 
             $user = $_SERVER['PHP_AUTH_USER'];
