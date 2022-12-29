@@ -35,6 +35,7 @@ class Player extends Model
         'email_verified',
         'status',
         'credits',
+        'free_credit_granted',
         'odds_type',
         'daily_bet_limit',
         'daily_win_limit',

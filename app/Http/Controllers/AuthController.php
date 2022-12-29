@@ -17,9 +17,9 @@ class AuthController extends Controller
     public function getToken(){
         $app = ApiAccount::first();
         $data = [
-            // 'event_id' => 118,
-            // 'from_date' => "2022-11-01",
-            // 'to_date' => "2022-11-22",
+            'operator' => 'cockpit_gaming',
+            'username' => 'player_angelo',
+            'player_id' => 20221229001,
         ];
         return JWT::encode($data, $app->secret, 'HS256');
     }
@@ -49,6 +49,10 @@ class AuthController extends Controller
                         $player->agent_id = $agent->id;
                         $player->agent_username = $agent->username;
                     }
+                    if(!$player->free_credit_granted){
+                        $player->free_credit_granted = 1;
+                        $player->credits += 10;
+                    }
                     $player->token = $token;
                     $player->username = $request->username;
                     $save = $player->save();
@@ -68,6 +72,8 @@ class AuthController extends Controller
                     $save = Player::create([
                         'username' => $request->username,
                         'partner_id' => $request->player_id,
+                        'credits' => 10,
+                        'free_credit_granted' => 1,
                         'password' => $token,
                         'token' => $token,
                         'status' => 'ACTIVE',
