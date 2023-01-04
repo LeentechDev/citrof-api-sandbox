@@ -8,6 +8,7 @@ use App\Models\Agent;
 use App\Models\ApiAccount;
 use Illuminate\Support\Facades\Hash;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
+use Illuminate\Support\Facades\Log;
 
 use Firebase\JWT\JWT;
 
@@ -17,9 +18,9 @@ class AuthController extends Controller
     public function getToken(){
         $app = ApiAccount::first();
         $data = [
-            // 'event_id' => 118,
-            // 'from_date' => "2022-11-01",
-            // 'to_date' => "2022-11-22",
+            'operator' => 'cockpitgaming',
+            'username' => 'cg_jm',
+            'player_id' => 202212140001,
         ];
         return JWT::encode($data, $app->secret, 'HS256');
     }
@@ -29,6 +30,7 @@ class AuthController extends Controller
         $data = decodeToken($request);
         if(!$data['error']){
             $request = $data['data'];
+            Log::info('Generate token payload: '.json_encode($request));
 
             $token = substr(str_shuffle( 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@$'), 0, 100);
 
