@@ -58,7 +58,7 @@ class Player extends Model
         'province',
         'country',
         'token',
-        'jwt',
+        'game_session_token',
         'currency_display',
         'language',
         'ticket_number',

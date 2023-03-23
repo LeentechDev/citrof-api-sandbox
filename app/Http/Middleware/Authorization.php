@@ -27,11 +27,10 @@ class Authorization
             $user = $_SERVER['PHP_AUTH_USER'];
             $pass = $_SERVER['PHP_AUTH_PW'];
 
-            Log::info('Username: '.$user);
-            Log::info('Authorization key: '.$pass);
-
+            Log::info('Game session token: '.$request->header('X-Partner-Authorization'));
+            
             $validated = (in_array($user, $valid_users)) && ($pass == $valid_passwords[$user]);
-
+            
             if (!$validated) {
                 header('WWW-Authenticate: Basic realm="API Sandbox"');
                 header('HTTP/1.0 401 Unauthorized');
@@ -40,12 +39,16 @@ class Authorization
                     'reason' => "The authentication token doesn't match any of our authorized integrators. Please check if your username (App ID) and password is correct (Authorization Key)"
                 ],401);
             }
-
+            
             return $next($request);
         }else{
             header('WWW-Authenticate: Basic realm="API Sandbox"');
             header('HTTP/1.0 401 Unauthorized');
-            return response()->json(['error' => true,
+ 
+            Log::info('Authorization: '.$request->header('Authorization'));
+ 
+            return response()->json([
+                'error' => true,
                 'message' => 'Not authorized',
                 'reason' => "The authentication token doesn't match any of our authorized integrators. Please check if your username (App ID) and password is correct (Authorization Key)"
             ],401);

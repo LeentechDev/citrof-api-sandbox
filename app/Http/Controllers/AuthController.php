@@ -29,6 +29,7 @@ class AuthController extends Controller
 
         $data = decodeToken($request);
         if(!$data['error']){
+            $game_session_token = $request->header('X-Partner-Authorization');
             $request = $data['data'];
             Log::info('Generate token payload: '.json_encode($request));
 
@@ -52,6 +53,7 @@ class AuthController extends Controller
                         $player->agent_username = $agent->username;
                     }
                     $player->token = $token;
+                    $player->game_session_token = $game_session_token;
                     $player->username = $request->username;
                     $save = $player->save();
 
@@ -72,6 +74,7 @@ class AuthController extends Controller
                         'partner_id' => $request->player_id,
                         'password' => $token,
                         'token' => $token,
+                        'game_session_token' => $game_session_token,
                         'status' => 'ACTIVE',
                         'email_verified' => 'YES',
                         'agent_id' => $agent->id,
